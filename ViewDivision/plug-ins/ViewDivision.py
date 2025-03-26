@@ -7,10 +7,15 @@ import maya.api.OpenMaya as om
 def maya_useNewAPI():
     pass
 
-# try:
-#     import cv2
-# except:
-#     cmds.error('OpenCVがインポートできませんでした。')
+try:
+    import numpy as np
+except:
+    cmds.error('NumPyがインポートできませんでした。')
+
+try:
+    import cv2
+except:
+    cmds.error('OpenCVがインポートできませんでした。')
 
 class ViewDivisionCmd(om.MPxCommand):
     kPluginCmdName = "viewDivision"
@@ -46,8 +51,22 @@ class ViewDivisionCmd(om.MPxCommand):
             cmds.warning('エラーが発生しました。')
 
     def redoIt(self):
-        print('ついに来たよ！')
-        sys.stderr.write(f'カメラは{self.camera}, 横は{self.horizontal}, 縦は{self.vertical}だよね！')
+        width_resolution = cmds.getAttr("defaultResolution.width")
+        height_resolution = cmds.getAttr("defaultResolution.height")
+        camera_shape = self.camera
+        horizontal_division = self.horizontal
+        vertical_division = self.vertical
+
+        width_division_pixel = int(width_resolution / horizontal_division)
+        height_division_pixel = int(height_resolution / vertical_division)
+
+        img = np.zeros((height_resolution, width_resolution, 4), dtype=np.uint8)
+
+        for i in range(vertical_division - 1):
+            img[height_division_pixel * (i + 1), :, :4] = 255
+        for j in range(horizontal_division - 1):
+            img[:, width_division_pixel * (j + 1), :4] = 255
+        cv2.imwrite('path', img)
 
     # def undoIt(self):
 
