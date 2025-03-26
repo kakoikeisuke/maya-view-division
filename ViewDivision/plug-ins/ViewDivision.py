@@ -74,7 +74,23 @@ class ViewDivisionCmd(om.MPxCommand):
             cv2.imwrite(sourceimages_path + 'ViewDivisionImagePlane.png', img)
         except:
             cmds.error('イメージプレーン画像の生成に失敗したため, 中断しました。')
-            sys.exit()
+
+        # mel.eval("source AEimagePlaneTemplate.mel")
+        # mel_command = 'AEinvokeFitRezGate ' + camera_shape +  '->' +image_plane[0] + '.sizeX ' + camera_shape + '->' + image_plane[0] + '.sizeY'
+        # mel_command = 'AEinvokeFitRezGate(perspShape)'
+        # mel.eval(mel_command)
+
+        # cmds.camera(camera_shape, edit=True, filmFit='overscan')
+
+        film_width_inch = 1.417
+        cmds.setAttr(camera_shape + '.horizontalFilmAperture', film_width_inch)
+        cmds.setAttr(camera_shape + '.verticalFilmAperture', (film_width_inch * height_resolution) / width_resolution)
+        cmds.setAttr(camera_shape + '.filmFit', 3)
+
+        image_plane = cmds.imagePlane(fileName=sourceimages_path + 'ViewDivisionImagePlane.png', camera=camera_shape,
+                                      showInAllViews=False)
+        cmds.setAttr(camera_shape + '.displayResolution', True)
+        cmds.setAttr(image_plane[0] + '.fit', 0)
 
     # def undoIt(self):
 
