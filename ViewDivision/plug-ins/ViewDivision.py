@@ -16,7 +16,7 @@ class ViewDivisionCmd(om.MPxCommand):
     kPluginCmdName = "viewDivision"
     def __init__(self):
         om.MPxCommand.__init__(self)
-        self.camera = ''
+        self.camera = 'perspShape'
         self.horizontal = 3
         self.vertical = 3
 
@@ -46,8 +46,8 @@ class ViewDivisionCmd(om.MPxCommand):
             cmds.warning('エラーが発生しました。')
 
     def redoIt(self):
-        active_panel = cmds.getPanel(withFocus=True)
-        print(str(active_panel))
+        print('ついに来たよ！')
+        sys.stderr.write(f'カメラは{self.camera}, 横は{self.horizontal}, 縦は{self.vertical}だよね！')
 
     # def undoIt(self):
 
@@ -110,11 +110,15 @@ def new_window_for_view_division():
         widthHeight=(300, 100)
     )
     cmds.columnLayout()
-    cmds.optionMenu(label='接続するカメラ')
+    cmds.optionMenu(
+        'camera_option_menu',
+        label='接続するカメラ'
+    )
     camera_list = cmds.ls(cameras=True)
     for i in range(len(camera_list)):
         cmds.menuItem(label=camera_list[i])
     cmds.intSliderGrp(
+        'horizontal_slider',
         label='水平方向の分割数',
         field=True,
         minValue=1,
@@ -123,6 +127,7 @@ def new_window_for_view_division():
         step=1
     )
     cmds.intSliderGrp(
+        'vertical_slider',
         label='垂直方向の分割数',
         field=True,
         minValue=1,
@@ -131,7 +136,14 @@ def new_window_for_view_division():
         step=1
     )
     cmds.button(
-        label='適用'
+        label='適用',
+        command=lambda x:get_ui_value()
     )
 
     cmds.showWindow(window)
+
+    def get_ui_value():
+        camera = cmds.optionMenu('camera_option_menu', query=True, value=True)
+        horizontal = cmds.intSliderGrp('horizontal_slider', query=True, value=True)
+        vertical = cmds.intSliderGrp('vertical_slider', query=True, value=True)
+        cmds.viewDivision(camera=camera, horizontal=horizontal, vertical=vertical)
