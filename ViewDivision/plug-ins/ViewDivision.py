@@ -1,4 +1,5 @@
 import sys
+
 import maya.cmds as cmds
 import maya.mel as mel
 import maya.api.OpenMaya as om
@@ -106,6 +107,31 @@ def new_window_for_view_division():
     window = cmds.window(
         'viewDivisionWindow',
         title='分割線イメージプレーンの作成',
-        widthHeight=(500, 500)
+        widthHeight=(300, 100)
     )
+    cmds.columnLayout()
+    cmds.optionMenu(label='接続するカメラ')
+    camera_list = cmds.ls(cameras=True)
+    for i in range(len(camera_list)):
+        cmds.menuItem(label=camera_list[i])
+    cmds.intSliderGrp(
+        label='水平方向の分割数',
+        field=True,
+        minValue=1,
+        maxValue=10,
+        value=3,
+        step=1
+    )
+    cmds.intSliderGrp(
+        label='垂直方向の分割数',
+        field=True,
+        minValue=1,
+        maxValue=10,
+        value=3,
+        step=1
+    )
+    cmds.button(
+        label='適用'
+    )
+
     cmds.showWindow(window)
