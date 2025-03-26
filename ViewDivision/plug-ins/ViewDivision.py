@@ -1,3 +1,4 @@
+import os
 import sys
 
 import maya.cmds as cmds
@@ -66,7 +67,14 @@ class ViewDivisionCmd(om.MPxCommand):
             img[height_division_pixel * (i + 1), :, :4] = 255
         for j in range(horizontal_division - 1):
             img[:, width_division_pixel * (j + 1), :4] = 255
-        cv2.imwrite('path', img)
+        sourceimages_path = cmds.workspace(query=True, rootDirectory=True) + 'sourceimages/'
+        if not os.path.exists(sourceimages_path):
+            cmds.error('プロジェクトフォルダ内にsourceimagesフォルダが存在しないため, 中断しました。')
+        try:
+            cv2.imwrite(sourceimages_path + 'ViewDivisionImagePlane.png', img)
+        except:
+            cmds.error('イメージプレーン画像の生成に失敗したため, 中断しました。')
+            sys.exit()
 
     # def undoIt(self):
 
