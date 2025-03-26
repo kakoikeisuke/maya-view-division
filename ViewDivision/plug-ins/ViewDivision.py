@@ -75,13 +75,6 @@ class ViewDivisionCmd(om.MPxCommand):
         except:
             cmds.error('イメージプレーン画像の生成に失敗したため, 中断しました。')
 
-        # mel.eval("source AEimagePlaneTemplate.mel")
-        # mel_command = 'AEinvokeFitRezGate ' + camera_shape +  '->' +image_plane[0] + '.sizeX ' + camera_shape + '->' + image_plane[0] + '.sizeY'
-        # mel_command = 'AEinvokeFitRezGate(perspShape)'
-        # mel.eval(mel_command)
-
-        # cmds.camera(camera_shape, edit=True, filmFit='overscan')
-
         film_width_inch = 1.417
         cmds.setAttr(camera_shape + '.horizontalFilmAperture', film_width_inch)
         cmds.setAttr(camera_shape + '.verticalFilmAperture', (film_width_inch * height_resolution) / width_resolution)
@@ -91,11 +84,7 @@ class ViewDivisionCmd(om.MPxCommand):
                                       showInAllViews=False)
         cmds.setAttr(camera_shape + '.displayResolution', True)
         cmds.setAttr(image_plane[0] + '.fit', 0)
-
-    # def undoIt(self):
-
-    # def isUndoable(self):
-        # return True
+        delete_window_for_view_division()
 
 def initializePlugin(plugin):
     vendor = "Kakoi Keisuke"
@@ -190,3 +179,7 @@ def new_window_for_view_division():
         horizontal = cmds.intSliderGrp('horizontal_slider', query=True, value=True)
         vertical = cmds.intSliderGrp('vertical_slider', query=True, value=True)
         cmds.viewDivision(camera=camera, horizontal=horizontal, vertical=vertical)
+
+def delete_window_for_view_division():
+    if cmds.window('viewDivisionWindow', exists=True):
+        cmds.deleteUI('viewDivisionWindow')
